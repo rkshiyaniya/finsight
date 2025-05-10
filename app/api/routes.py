@@ -4,6 +4,7 @@ from app.db.session import get_session
 from app.crud.transaction import get_transactions, create_transaction
 from app.schemas import TransactionCreate, TransactionOut
 from typing import List
+from app.core.deps import get_current_user
 
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 
@@ -22,3 +23,7 @@ async def add_transaction(txn: TransactionCreate, session: AsyncSession = Depend
     """
     transaction = await create_transaction(session, txn.dict())
     return transaction
+
+@router.get("/secure/me")
+async def get_me(user=Depends(get_current_user)):
+    return {"username": user.username, "admin": user.is_admin}
